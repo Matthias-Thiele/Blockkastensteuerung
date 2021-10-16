@@ -9,13 +9,16 @@ class DebouncedPin {
     bool tick(unsigned long now);
     void update();
     bool read();
+    bool triggered();
 
   private:
     uint8_t m_pin;
-    uint8_t m_history;
+    short m_history;
     uint8_t m_count;
+    bool m_lastState;
     unsigned long m_deltaReadMillis;
     unsigned long m_nextRead;
+    bool m_isCleared;
 };
 
 #endif

@@ -4,7 +4,7 @@
 
 class Ticker {
   public:
-    Ticker(uint8_t port, int stateDurationMillis, int totalDurationMillis);
+    Ticker(uint8_t port, int stateDurationMillis, int totalDurationMillis, int x);
     void start();
     void end();
     void tick(unsigned long now);
@@ -15,7 +15,7 @@ class Ticker {
     int m_stateDurationMillis;
     int m_totalDurationMillis;
 
-    uint8_t m_count;
+    volatile uint8_t m_count;
     unsigned long m_tickerDone;
     unsigned long m_nextChange;
     bool m_actState;

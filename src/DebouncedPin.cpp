@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include "DebouncedPin.hpp"
 
-#define SHIFT_OUT_BIT 0x40
-#define ONE_THRESHOLD 3
-#define SHIFT_COUNT 7
+#define SHIFT_OUT_BIT 0x200
+#define ONE_THRESHOLD 7
+#define ZERO_THRESHOLD 3
+#define SHIFT_COUNT 10
 
 DebouncedPin::DebouncedPin() {
   m_pin = 0xff;
@@ -21,6 +22,7 @@ void DebouncedPin::init(uint8_t pin, unsigned long deltaReadMillis){
   
   m_history = 0;
   m_count = 0;
+  m_lastState = false;
 
   for (uint8_t i = 0; i < SHIFT_COUNT; i++) {
     update();
@@ -42,6 +44,16 @@ void DebouncedPin::update() {
   }
 
   m_history = (m_history << 1) | (actValue & 1);
+
+  if (m_lastState) {
+    if (m_count < ZERO_THRESHOLD) {
+      m_lastState = false;
+    }
+  } else {
+    if (m_count > ONE_THRESHOLD) {
+      m_lastState = true;
+    }
+  }
 }
 
 /**
@@ -49,9 +61,31 @@ void DebouncedPin::update() {
  * debounced input pin.
  **/
 bool DebouncedPin::read() {
-  return m_count > ONE_THRESHOLD;
+  return m_lastState;
 }
 
+/**
+ * Returns one time true on positive
+ * edge of input pin.
+ **/
+bool DebouncedPin::triggered() {
+  if (m_lastState) {
+    if (m_isCleared) {
+      m_isCleared = false;
+      return true;
+    }
+  } else {
+    m_isCleared = true;
+  }
+
+  return false;
+}
+
+/**
+ * Weiterleitung aus der Arduino loop Funktion, wird
+ * für die asynchronen Vorgänge benötigt und muss
+ * regelmäßig aufgerufen werden.
+ **/
 bool DebouncedPin::tick(unsigned long now) {
   if (now > m_nextRead) {
     update();

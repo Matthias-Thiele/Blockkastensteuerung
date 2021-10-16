@@ -1,6 +1,12 @@
 #include "InputState.hpp"
 #include "PortDefinitions.hpp"
 
+/**
+ * Liest den aktuellen Zustand der Bahnhofs- und
+ * Streckenblöcke ein und meldet diesen an das
+ * CommandProcessor Modul zurück zur Aktivierung
+ * der jeweiligen Blöcke.
+ **/
 InputState::InputState() {
   for (uint8_t i = 0; i < 6; i++) {
     pinMode(zustimmungsports[i], INPUT_PULLUP);
@@ -11,11 +17,20 @@ InputState::InputState() {
   }
 }
 
+/**
+ * Weiterleitung aus der Arduino loop Funktion, wird
+ * für die asynchronen Vorgänge benötigt und muss
+ * regelmäßig aufgerufen werden.
+ **/
 void InputState::tick(unsigned long now) {
   readAllInputs();
   calcCompounds();
 }
 
+/**
+ * Liest die Arduino Input-Pins ein und
+ * trägt den Status in Variablen ein.
+ **/
 void InputState::readAllInputs() {
   ZustimmungA1 = digitalRead(IN_A1);
   ZustimmungA2 = digitalRead(IN_A2);
@@ -34,11 +49,18 @@ void InputState::readAllInputs() {
 
 }
 
+/**
+ * Gruppierung einiger Zustimmungen die an
+ * einigen Stellen gemeinsam benötigt werden.
+ **/
 void InputState::calcCompounds() {
   ZustimmungAllA = ZustimmungA1 && ZustimmungA2 && ZustimmungA4;
   ZustimmungAllB = ZustimmungB2 && ZustimmungB4;
 }
 
+/**
+ * Testausgabe aller internen Zustände.
+ **/
 void InputState::print() {
   Serial.print("A1: "), Serial.print( ZustimmungA1 ); 
   Serial.print(", A2: "), Serial.print( ZustimmungA2 ); 

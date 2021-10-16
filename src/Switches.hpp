@@ -1,12 +1,17 @@
+#ifndef _SWITCHES__
+#define _SWITCHES__
+
 #include <Arduino.h>
+#include "Ticker.hpp"
 
 class Switches {
   public:
-    Switches();
+    Switches(Ticker *ticker);
     void tick(unsigned long now);
     unsigned long getActValue();
 
   private:
+    Ticker *m_ticker;
     unsigned long m_nextTick;
     unsigned long m_lastValue;
     uint8_t state;
@@ -20,3 +25,5 @@ class Switches {
     uint8_t readRegister(uint8_t addr, uint8_t regNo);
     void fillup(unsigned long &result, unsigned long *mapper, uint8_t source, uint8_t size);
 };
+
+#endif

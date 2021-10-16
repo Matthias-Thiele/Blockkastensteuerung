@@ -1,5 +1,6 @@
 #ifndef _COMMANDPROCESSOR__
 #define _COMMANDPROCESSOR__
+
 #include <Arduino.h>
 #include "Ticker.hpp"
 #include "BlockPort.hpp"
@@ -26,13 +27,16 @@
 
 class CommandProcessor {
   public:
-    CommandProcessor();
-    void execute(uint8_t command);
+    CommandProcessor(Ticker *ticker);
+    void execute(uint8_t command, bool hasGleisbild);
     void tick(unsigned long now);
-
+    uint8_t getDirectionLB_AH();
+    uint8_t getFreeStateLB_AH();
+    
   private:
-    Ticker *ticker;
+    Ticker *m_ticker;
     InputState *state;
+    unsigned long m_gleisbildWatchdog = 0;
 
     BlockPort *Zustimmung[NUMBER_OF_ZUSTIMMUNGEN];
     BlockPort *Streckenblock[NUMBER_OF_STRECKENBLOCK];
